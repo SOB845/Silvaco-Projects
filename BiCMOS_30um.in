@@ -1,0 +1,132 @@
+go athena
+
+# ---------------------------
+# Mesh (refined near surface and device areas)
+# ---------------------------
+line x loc=0.0   spac=0.5
+line x loc=2.0   spac=0.05   ;# NPN region left edge
+line x loc=6.0   spac=0.02
+line x loc=10.0  spac=0.05
+line x loc=12.0  spac=0.05   ;# CMOS region start
+line x loc=16.0  spac=0.02
+line x loc=20.0  spac=0.05
+line x loc=30.0  spac=0.5
+
+line y loc=0.0   spac=0.02   ;# surface fine mesh
+line y loc=0.2   spac=0.02
+line y loc=0.5   spac=0.05
+line y loc=1.0   spac=0.1
+line y loc=2.0   spac=0.2
+line y loc=5.0   spac=0.5
+#line y loc=10.0  spac=1.0
+
+# ---------------------------
+# Initialize substrate
+# ---------------------------
+init silicon orientation=100 c.boron=1e15 ;#Boron is P-type
+
+# -----------------------------------------------
+# BURIED N+ LAYER FOR NPN COLLECTER (deep, heavy)
+#		Fom x=2um to x=10um
+# -----------------------------------------------
+
+deposit oxide thick=1
+
+# MASK 1
+etch start x=2 y=-1
+etch cont x=10 y=-1
+etch cont x=10 y=0
+etch done x =2 y=0
+
+implant arsenic dose=3.0e14 energy=120 tilt=7
+diffus temp=1100 time=45 minutes  ;# drive-in to form buried layer
+
+etch oxide all
+
+save outfile = buried_n.str
+#tonyplot buried_n.str
+
+epitaxy time=40 minutes temp=1100 thickness=3 c.boron=1e15 
+
+save outfile = epi_silicon.str
+tonyplot epi_silicon.str
+
+
+#---------------------------------------------------------
+#			N-WELL FOR PMOS
+# From x=15um to 20um
+#---------------------------------------------------------
+
+deposit oxide thick=0.70
+
+# MASK 2
+etch start x=15 y=-3.70
+etch cont x=20 y=-3.70
+etch cont x=20 y=-3.0
+etch done x =15 y=-3.0
+
+implant phosphorus dose=2e16 energy=85 tilt=7
+diffuse temp= 1100 time=1.5 hours
+
+save outfile = NWELL.str
+#tonyplot NWELL.str
+
+etch start x=23 y=-3.70
+etch cont x=28 y=-3.70
+etch cont x=28 y=-3.0
+etch done x=23 y=-3.0
+#---------------------------------------------------------
+#			Polysilicon Deposition
+#---------------------------------------------------------
+deposit oxide thick=0.30
+deposit polysilicon thick=1 
+
+save outfile = Poly.str
+tonyplot poly.str
+
+# Mask Emitter window
+etch start x=2 y=-5
+etch cont x=4 y=-5
+etch cont x=4 y=-3.0
+etch done x=2 y=-3.0
+
+# Mask P regions
+etch start x=15 y=-5
+etch cont x=16.5 y=-5
+etch cont x=16.5 y=-3.0
+etch done x=15 y=-3.0
+
+etch start x=18.5 y=-5
+etch cont x=20 y=-5
+etch cont x=20 y=-3.0
+etch done x=18.5 y=-3.0
+
+# Mask N regions
+etch start x=23 y=-5
+etch cont x=25 y=-5
+etch cont x=25 y=-3.0
+etch done x=23 y=-3.0
+
+etch start x=27 y=-5
+etch cont x=29 y=-5
+etch cont x=29 y=-3.0
+etch done x=27 y=-3.0
+
+save outfile = Poly_etched.str
+tonyplot poly_etched.str
+
+
+implant arsenic dose=5e15 energy=100 ;#Arsenic is N-type
+diffuse temp= 700 time=5 hours
+
+save outfile = Poly_diffused.str
+tonyplot Poly_diffused.str
+
+#deposit 
+
+# ---------------------------
+# Save structure for ATLAS device simulation
+# ---------------------------
+structure outfile=basic_bicmos_30um.str
+
+quit
