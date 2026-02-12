@@ -42,6 +42,7 @@ diffus temp=1100 time=45 minutes  ;# drive-in to form buried layer
 
 etch oxide all
 
+structure outfile = buried_n.str
 save outfile = buried_n.str
 tonyplot buried_n.str
 
@@ -82,7 +83,7 @@ etch cont x=20 y=-3
 etch cont x=20 y=-2.0
 etch done x =15 y=-2.0
 
-implant phosphorus dose=3e14 energy=150 ;# Affects PMOS Vt
+implant phosphorus dose=3e13 energy=150 ;# Affects PMOS Vth
 diffuse temp= 1100 time = 100
 
 save outfile = CollNwell.str
@@ -101,7 +102,7 @@ etch cont x=5 y=-2
 etch done x =3 y=-2
 
 implant boron dose=5e15 energy=40 tilt=7
-diffuse temp=950 time=25
+diffuse temp=950 time=20
 
 save outfile = base.str
 tonyplot base.str
@@ -133,41 +134,55 @@ etch oxide all
 # ---------------------------
 
 # Grow thin gate oxide
-#diffuse temp=900 time=20 dryo2  which yields ~20nm gate oxide failed due to computational incapability
-deposit oxide thick=0.2
+
+deposit oxide thick=0.3
 
 # Deposit polysilicon for gates
-deposit poly thick=0.3 divisions=10
+deposit poly thick=0.2 divisions=10	;# 2.5um thick
 
 save outfile = polysilic.str
 tonyplot polysilic.str
 
 
-
 # Pattern gates:
 # PMOS gate in N-well region (x=15-17um & x=18-20um)
-etch poly start x=15.0 y=-2.5
+etch poly start x=0 y=-2.5
 etch cont x=17.0 y=-2.5
-etch cont x=17.0 y=-2.0
-etch done x=15.0 y=-2.0
+etch cont x=17.0 y=-2.3
+etch done x=0 y=-2.3
 
 etch poly start x=18.0 y=-2.5
-etch cont x=20.0 y=-2.5
-etch cont x=20.0 y=-2.0
-etch done x=18.0 y=-2.0
+etch cont x=26.0 y=-2.5
+etch cont x=26.0 y=-2.3
+etch done x=18.0 y=-2.3
 
-etch oxide start x=15.0 y=-2.5
-etch cont x=17.0 y=-2.5
+etch poly start x=27.0 y=-2.5
+etch cont x=30.0 y=-2.5
+etch cont x=30.0 y=-2.3
+etch done x=27.0 y=-2.3
+
+save outfile = gates.str
+tonyplot gates.str
+
+# oxide too thin, more needed
+#deposit oxide thick=0.3 ;# 2.5um thick
+
+# etch PR from PMOS S/D surfaces
+
+
+
+etch oxide start x=15.0 y=-2.3
+etch cont x=17.0 y=-2.3
 etch cont x=17.0 y=-2.0
 etch done x=15.0 y=-2.0
 
-etch oxide start x=18.0 y=-2.5
-etch cont x=20.0 y=-2.5
+etch oxide start x=18.0 y=-2.3
+etch cont x=20.0 y=-2.3
 etch cont x=20.0 y=-2.0
 etch done x=18.0 y=-2.0
 
-save outfile=with_gates.str
-tonyplot with_gates.str
+save outfile=pmos_gate.str
+tonyplot pmos_gate.str
 
 
 #---------------------------------------------------------
@@ -181,51 +196,121 @@ implant boron dose=4e15 energy=40 tilt=7  ;# PMOS S/D only
 save outfile = pmos_SD.str
 tonyplot pmos_SD.str
 
-# 2. New oxide for NMOS only 
-# S side 
-deposit oxide thick=0.3
 
-etch oxide start x=25 y=-2.8   ;# Etch new 0.3um oxide
-etch cont x=26 y=-2.8
-etch cont x=26 y=-2.5
-etch done x=25 y=-2.5
+etch oxide
+save outfile = pmos_etch.str
+tonyplot pmos_etch.str
 
-etch poly start x=25 y=-2.5   ;# Etch Polysilicon
-etch cont x=26 y=-2.5
-etch cont x=26 y=-2.2
-etch done x=25 y=-2.2
+# Source side 
+deposit oxide thick=0.3	;# Passivation Layer
 
-etch oxide start x=25 y=-2.2   ;# Etch 0.2um thick oxide
-etch cont x=26 y=-2.2
-etch cont x=26 y=-2.0
-etch done x=25 y=-2.0
+save outfile = passivation.str
+tonyplot passivation.str
+
+etch oxide start x=9.25 y=-2.3   ;# Etch Collector contact
+etch cont x=9.75 y=-2.3
+etch cont x=9.75 y=-2.0
+etch done x=9.25 y=-2.0
+
+etch oxide start x=24.3 y=-2.3 ;# Etch Source
+etch cont x=25.69 y=-2.3
+etch cont x=25.69 y=-2.0
+etch done x=24.3 y=-2.0
+
+
+etch oxide start x=27.33 y=-2.3   ;# Etch Drain
+etch cont x=28.4 y=-2.3
+etch cont x=28.4 y=-2.0
+etch done x=27.33 y=-2.0
+
+
+save outfile = nmos_etch.str
+tonyplot nmos_etch.str
+
 #------------------------------------
-# D side
+# Deposit N type material
 
-etch oxide start x=27 y=-2.8   ;#
-etch cont x=28 y=-2.8
-etch cont x=28 y=-2.5
-etch done x=27 y=-2.5
-
-etch poly start x=27 y=-2.5   ;# Etch 0.3um oxide to reach polysilicon
-etch cont x=28 y=-2.5
-etch cont x=28 y=-2.2
-etch done x=27 y=-2.2
-
-etch oxide start x=27 y=-2.2   ;# Etch 0.2um thick oxide
-etch cont x=28 y=-2.2
-etch cont x=28 y=-2.0
-etch done x=27 y=-2.0
-
-implant arsenic dose=5e15 energy=40 tilt=7 ;#Very low diffusivity; shallow junctions
+implant arsenic dose=5e18 energy=45 ;#Very low diffusivity; shallow junctions; tilt not preferred
 
 # 3. Single activation for both
-diffuse temp=900 time=10
+diffuse temp=950 time=12
+
 
 # ---------------------------
 # Save structure for ATLAS device simulation
+
 # ---------------------------
+structure outfile = basic_bicmos_30um.str
+
 save outfile=basic_bicmos_30um.str
 tonyplot basic_bicmos_30um.str
+
+
+deposit oxide thick=0.1
+save outfile = basic_bicmos_etched.str
+tonyplot basic_bicmos_etched.str
+
+# Metallization
+
+
+etch oxide start x=1.3 y=-2.4   ;# Etch Emitter Contact
+etch cont x=1.6 y=-2.4
+etch cont x=1.6 y=-2.0
+etch done x=1.3 y=-2.0
+
+etch oxide start x=3.75 y=-2.4   ;# Etch Base Contact
+etch cont x=4.25 y=-2.4
+etch cont x=4.25 y=-2.0
+etch done x=3.75 y=-2.0
+
+etch oxide start x=9.25 y=-2.1   ;# Etch Collector Contact
+etch cont x=9.75 y=-2.1
+etch cont x=9.75 y=-2.0
+etch done x=9.25 y=-2.0
+
+save outfile = bjt_metal.str
+tonyplot bjt_metal.str
+
+
+
+etch oxide start x=15.5 y=-2.4   ;# Etch PMOS S Contact
+etch cont x=16.4 y=-2.4
+etch cont x=16.4 y=-2.0
+etch done x=15.5 y=-2.0
+
+etch oxide start x=17.3 y=-2.9   ;# Etch PMOS Gate Contact
+etch cont x=17.7 y=-2.9
+etch cont x=17.7 y=-2.5
+etch done x=17.3 y=-2.5
+
+etch oxide start x=18.75 y=-2.4   ;# Etch PMOS D Contact
+etch cont x=19.5 y=-2.4
+etch cont x=19.5 y=-2.0
+etch done x=18.75 y=-2.0
+
+
+etch oxide start x=24.75 y=-2.1   ;# Etch NMOS D Contact
+etch cont x=25.3 y=-2.1
+etch cont x=25.3 y=-2.0
+etch done x=24.75 y=-2.0
+
+etch oxide start x=26.3 y=-2.9   ;# Etch NMOS Gate Contact
+etch cont x=26.7 y=-2.9
+etch cont x=26.7 y=-2.5
+etch done x=26.3 y=-2.5
+
+etch oxide start x=27.65 y=-2.1   ;# Etch NMOS S Contact
+etch cont x=28.0 y=-2.1
+etch cont x=28.0 y=-2.0
+etch done x=27.65 y=-2.0
+
+save outfile = cmos_metal_etch.str
+tonyplot cmos_metal_etch.str
+
+
+# 
+deposit aluminum thick=0.5 
+save outfile = bicmos_finished.str
+tonyplot bicmos_finished.str
 
 quit
